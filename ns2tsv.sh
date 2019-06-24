@@ -1,1 +1,1 @@
-cat ns.txt| jq -r '["\(.domain)", "\(.result|@csv|gsub("\"";""))"]|@tsv' > ns.tsv
+cat ns.txt| jq -r '["\(.domain)", "\(.results|@csv|gsub("\"";""))"]|@tsv' > ns.tsv
