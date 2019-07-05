@@ -104,7 +104,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# 
+#
+Pipfile.lock
 a.txt
 input.txt
 ns.txt
