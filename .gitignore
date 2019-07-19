@@ -104,8 +104,17 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# pytype
+.pytype/
+pytype.cfg
+
 #
-Pipfile.lock
+.diglist3r/
 a.txt
 input.txt
+reverse_ip.txt
 ns.txt
+ns.tsv
+a.tsv
+x.txt
+x.tsv
