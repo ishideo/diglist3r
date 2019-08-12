@@ -1,5 +1,5 @@
 {
-  input: "input.txt",
-  output: "ns.txt",
-  config: ["dig", "@8.8.8.8", "ns", "+short"],
+  "input": "input.txt",
+  "output": "ns.txt",
+  "command": ["dig", "@8.8.8.8", "ns", "+short"]
 }

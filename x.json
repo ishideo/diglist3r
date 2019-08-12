@@ -1,5 +1,5 @@
 {
-  input: "input.txt",
-  output: "x.txt",
-  config: ["dig", "@8.8.8.8", "+short", "-x"],
+  "input": "input.txt",
+  "output": "x.txt",
+  "command": ["dig", "@8.8.8.8", "+short", "-x"]
 }

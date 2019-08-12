@@ -1,15 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import concurrent.futures
-import functools
 import json
 import logging
 import subprocess
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 from collections import OrderedDict
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
-from typing import IO, Dict, Iterator, List, Optional, Sequence, Tuple
+from typing import Any, IO, Dict, Iterator, List, Optional, Sequence, Tuple
 
 
 def dig(config: List[str], domain: str) -> str:
@@ -43,27 +41,38 @@ def get_lines(path: str) -> Iterator[str]:
     iterator: Iterator[str] = (line.strip("\n") for line in open(path))
     return iterator
 
-def read_config() -> Optional[Dict[str]]:
-    parser = ArgumentParser(description="")
-    parser.add_argument("--file", help="read configuration file")
-    parser.add_argument("-f", "--file")
-    args = parser.parse_args()
-    config_file = args.file
-    config: Dict[str] = json.load(config_file)
+
+def get_config_file() -> str:
+    config_file: str = "a.json"
+    parser: ArgumentParser = ArgumentParser(description="")
+    parser.add_argument("-f", "--file", help="read configuration file")
+    args: Namespace = parser.parse_args()
+    if args.file is not None:
+        config_file = args.file
+    return config_file
+
+
+def read_config() -> Dict[str, str]:
+    config_file: str = get_config_file()
+    file: IO[str] = open("./" + config_file, "r")
+    config: Dict[str, str] = json.load(file)
+    file.close()
     return config
 
 
 def main() -> None:
-    pool: concurrent.futures.process.ProcessPoolExecutor = ProcessPoolExecutor(
+    pool: ProcessPoolExecutor = ProcessPoolExecutor(
         max_workers=32
     )
-    #config = read_config()
-    dig_config: functools.partial[str] = partial(dig, ["dig", "@8.8.8.8", "a", "+short"])
-    #print(config["input"])
-    lines: Iterator[str] = get_lines("./input.txt")
-    jsonlines: List[str] = list(pool.map(dig_config, lines))
+    config: Dict[str, str] = read_config()
+    input: str = config["input"]
+    output: str = config["output"]
+    command: str = config["command"]
+    dig_partial: partial[str] = partial(dig, command)
+    lines: Iterator[str] = get_lines(input)
+    jsonlines: List[str] = list(pool.map(dig_partial, lines))
     text: str = "\n".join(jsonlines)
-    file: IO[str] = open("./a.txt", "w")
+    file: IO[str] = open(output, "w")
     file.write(text)
     file.close()
 
