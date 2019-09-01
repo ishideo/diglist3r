@@ -45,7 +45,7 @@ def get_lines(path: str) -> Iterator[str]:
 def get_config_file() -> str:
     config_file: str = "a.json"
     parser: ArgumentParser = ArgumentParser(description="")
-    parser.add_argument("-f", "--file", help="read configuration file")
+    parser.add_argument("-f", "--file", help="configuration filename")
     args: Namespace = parser.parse_args()
     if args.file is not None:
         config_file = args.file
