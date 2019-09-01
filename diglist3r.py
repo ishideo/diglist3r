@@ -7,7 +7,7 @@ from argparse import ArgumentParser, Namespace
 from collections import OrderedDict
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
-from typing import Any, IO, Dict, Iterator, List, Optional, Sequence, Tuple
+from typing import IO, Dict, Iterator, List, Sequence, Tuple
 
 
 def dig(config: List[str], domain: str) -> str:
