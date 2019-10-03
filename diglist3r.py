@@ -10,16 +10,18 @@ from functools import partial
 from typing import IO, Dict, Iterator, List, Sequence, Tuple
 
 
-def dig(config: List[str], domain: str) -> str:
+def dig(config: List[str], domain: str) -> List[str]:
     command: List[str] = config + [domain]
     process: Tuple[bytes, bytes] = subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     ).communicate()
     results: List[str] = process[0].decode("utf-8").strip("\n").split("\n")
+    return results
+
+
+def dig_wrapper(config: List[str], domain: str) -> str:
+    results: List[str] = dig(config, domain)
     jsonline: str = serialize_to_json(domain, results)
-    logging_output(jsonline)
     return jsonline
 
 
@@ -28,6 +30,7 @@ def serialize_to_json(domain: str, results: List[str]) -> str:
         [("domain", domain), ("results", results)]
     )
     jsonline: str = json.dumps(results_dict)
+    logging_output(jsonline)
     return jsonline
 
 
@@ -42,18 +45,24 @@ def get_lines(path: str) -> Iterator[str]:
     return iterator
 
 
-def get_config_file() -> str:
-    config_file: str = "a.json"
+def get_argument() -> str:
     parser: ArgumentParser = ArgumentParser(description="")
     parser.add_argument("-f", "--file", help="configuration filename")
     args: Namespace = parser.parse_args()
-    if args.file is not None:
-        config_file = args.file
-    return config_file
+    filename: str = args.file
+    return filename
+
+
+def get_config_path(filename: str) -> str:
+    config_path: str = "./a.json"
+    if filename is not None:
+        config_path = "./" + filename
+    return config_path
 
 
 def read_config() -> Dict[str, str]:
-    config_file: str = get_config_file()
+    filename: str= get_argument()
+    config_file: str = get_config_path(filename)
     file: IO[str] = open("./" + config_file, "r")
     config: Dict[str, str] = json.load(file)
     file.close()
@@ -61,14 +70,12 @@ def read_config() -> Dict[str, str]:
 
 
 def main() -> None:
-    pool: ProcessPoolExecutor = ProcessPoolExecutor(
-        max_workers=32
-    )
     config: Dict[str, str] = read_config()
+    pool: ProcessPoolExecutor = ProcessPoolExecutor(max_workers=32)
     input: str = config["input"]
     output: str = config["output"]
     command: str = config["command"]
-    dig_partial: partial[str] = partial(dig, command)
+    dig_partial: partial[str] = partial(dig_wrapper, command)
     lines: Iterator[str] = get_lines(input)
     jsonlines: List[str] = list(pool.map(dig_partial, lines))
     text: str = "\n".join(jsonlines)
