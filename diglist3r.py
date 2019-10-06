@@ -49,7 +49,7 @@ def get_argument() -> str:
     parser: ArgumentParser = ArgumentParser(description="")
     parser.add_argument("-c", "--config", help="configuration filename")
     args: Namespace = parser.parse_args()
-    filename: str = args.file
+    filename: str = args.config
     return filename
 
 
