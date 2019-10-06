@@ -47,7 +47,7 @@ def get_lines(path: str) -> Iterator[str]:
 
 def get_argument() -> str:
     parser: ArgumentParser = ArgumentParser(description="")
-    parser.add_argument("-f", "--file", help="configuration filename")
+    parser.add_argument("-c", "--config", help="configuration filename")
     args: Namespace = parser.parse_args()
     filename: str = args.file
     return filename
