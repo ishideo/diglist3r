@@ -54,24 +54,25 @@ def get_argument() -> str:
 
 
 def get_config_path(filename: str) -> str:
-    config_path: str = "./a.json"
+    config_path: str = "./config/" + "a.json"
     if filename is not None:
-        config_path = "./" + filename
+        config_path = "./config/" + filename
     return config_path
 
 
-def read_config() -> Dict[str, str]:
-    filename: str= get_argument()
-    config_file: str = get_config_path(filename)
-    file: IO[str] = open("./" + config_file, "r")
+def read_config(filename: str) -> Dict[str, str]:
+    config_path: str = get_config_path(filename)
+    file: IO[str] = open(config_path, "r")
     config: Dict[str, str] = json.load(file)
     file.close()
     return config
 
 
 def main() -> None:
-    config: Dict[str, str] = read_config()
-    pool: ProcessPoolExecutor = ProcessPoolExecutor(max_workers=32)
+    filename: str = get_argument()
+    config: Dict[str, str] = read_config(filename)
+    max_workers_value: int  = int(config["max_workers"])
+    pool: ProcessPoolExecutor = ProcessPoolExecutor(max_workers=max_workers_value)
     input: str = config["input"]
     output: str = config["output"]
     command: str = config["command"]

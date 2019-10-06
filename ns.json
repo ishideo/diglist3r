@@ -1,5 +1,0 @@
-{
-  "input": "input.txt",
-  "output": "ns.txt",
-  "command": ["dig", "@8.8.8.8", "ns", "+short"]
-}

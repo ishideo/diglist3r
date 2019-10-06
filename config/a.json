@@ -1,0 +1,6 @@
+{
+  "input": "input.txt",
+  "output": "a.txt",
+  "command": ["dig", "@8.8.8.8", "a", "+short"],
+  "max_workers": 32
+}
