@@ -71,7 +71,7 @@ def read_config(filename: str) -> Dict[str, str]:
 def main() -> None:
     filename: str = get_argument()
     config: Dict[str, str] = read_config(filename)
-    max_workers_value: int  = int(config["max_workers"])
+    max_workers_value: int = int(config["max_workers"])
     pool: ProcessPoolExecutor = ProcessPoolExecutor(max_workers=max_workers_value)
     input: str = config["input"]
     output: str = config["output"]

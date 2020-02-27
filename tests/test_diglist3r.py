@@ -1,12 +1,11 @@
 import json
 from typing import Any, Dict, List, Tuple
 
+import diglist3r
 import pytest
 
-import diglist3r
 
-
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore
     ("filename", "result"),
     [
         (None, "./config/a.json"),
@@ -20,7 +19,7 @@ def test_get_config_path(filename: str, result: str) -> None:
     assert result == config_path
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore
     ("domain", "results"),
     [
         ("google.com", ["172.217.31.142"]),
@@ -44,7 +43,7 @@ def test_serialize_to_json(domain: str, results: List[str]) -> None:
     assert len(json_dict.keys()) == 2
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore
     ("config", "domain"),
     [
         (["dig", "@8.8.8.8", "a", "+short"], "apnic.net"),
@@ -58,7 +57,7 @@ def test_dig_when_domain_is_lookedup(config: List[str], domain: str) -> None:
     assert isinstance(results, list)
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore
     ("config", "domain"),
     [
         (["dig", "@8.8.8.8", "a", "+short"], "alkjdjf"),
@@ -72,7 +71,7 @@ def test_dig_when_domain_is_not_lookedup(config: List[str], domain: str) -> None
     assert results[0] == ""
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore
     ("config", "domain", "results"),
     [
         (["dig", "@8.8.8.8", "a", "+short"], "apnic.net", ["203.119.101.61"]),
@@ -96,7 +95,7 @@ def test_dig_wrapper_when_domain_is_lookedup(
     assert len(jsonline_dict.keys()) == 2
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore
     ("filename", "result"),
     [
         (
