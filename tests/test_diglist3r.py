@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 import diglist3r
@@ -6,7 +7,7 @@ import pytest
 
 
 @pytest.mark.parametrize(  # type: ignore
-    ("filename", "result"),
+    ("config", "result"),
     [
         (None, "./config/a.json"),
         ("a.json", "./config/a.json"),
@@ -14,9 +15,9 @@ import pytest
         ("x.json", "./config/x.json"),
     ],
 )
-def test_get_config_path(filename: str, result: str) -> None:
-    config_path: str = diglist3r.get_config_path(filename)
-    assert result == config_path
+def test_get_config_path(config: str, result: str) -> None:
+    config_path: Path = diglist3r.get_config_path(config)
+    assert Path(result) == config_path
 
 
 @pytest.mark.parametrize(  # type: ignore
@@ -96,8 +97,17 @@ def test_dig_wrapper_when_domain_is_lookedup(
 
 
 @pytest.mark.parametrize(  # type: ignore
-    ("filename", "result"),
+    ("config", "result"),
     [
+        (
+            None,
+            {
+                "input": "input.txt",
+                "output": "a.txt",
+                "command": ["dig", "@8.8.8.8", "a", "+short"],
+                "max_workers": 32,
+            },
+        ),
         (
             "a.json",
             {
@@ -127,8 +137,8 @@ def test_dig_wrapper_when_domain_is_lookedup(
         ),
     ],
 )
-def test_read_config(filename: str, result: Dict[str, Any], mocker: Any) -> None:
-    config_path: str = "./tests/config/" + filename
+def test_read_config(config: str, result: Dict[str, Any], mocker: Any) -> None:
+    config_path: Path = diglist3r.get_config_path(config)
     mocker.patch.object(diglist3r, "get_config_path", return_value=config_path)
-    config: Dict[str, Any] = diglist3r.read_config(filename)
-    assert config == result
+    settings: Dict[str, Any] = diglist3r.read_config(config)
+    assert settings == result

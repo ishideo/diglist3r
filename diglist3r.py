@@ -3,11 +3,13 @@
 import json
 import logging
 import subprocess
-from argparse import ArgumentParser, Namespace
 from collections import OrderedDict
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
-from typing import IO, Dict, Iterator, List, Sequence, Tuple
+from pathlib import Path
+from typing import IO, Dict, Iterator, List, Optional, Sequence, Tuple
+
+import click
 
 
 def dig(config: List[str], domain: str) -> List[str]:
@@ -40,50 +42,44 @@ def logging_output(result: str) -> None:
     logging.info("%s", result)
 
 
-def get_lines(path: str) -> Iterator[str]:
+def get_lines(path: Path) -> Iterator[str]:
     iterator: Iterator[str] = (line.strip("\n") for line in open(path))
     return iterator
 
 
-def get_argument() -> str:
-    parser: ArgumentParser = ArgumentParser(description="")
-    parser.add_argument("-c", "--config", help="configuration filename")
-    args: Namespace = parser.parse_args()
-    filename: str = args.config
-    return filename
-
-
-def get_config_path(filename: str) -> str:
-    config_path: str = "./config/" + "a.json"
-    if filename is not None:
-        config_path = "./config/" + filename
+def get_config_path(config: Optional[str]) -> Path:
+    config_path: Path = Path("./config/" + "a.json")
+    if config is not None:
+        config_path = Path("./config/" + config)
     return config_path
 
 
-def read_config(filename: str) -> Dict[str, str]:
-    config_path: str = get_config_path(filename)
-    file: IO[str] = open(config_path, "r")
-    config: Dict[str, str] = json.load(file)
-    file.close()
-    return config
+def read_config(config: Optional[str]) -> Dict[str, str]:
+    config_path: Path = get_config_path(config)
+    f: IO[str] = open(config_path, "r")
+    settings: Dict[str, str] = json.load(f)
+    f.close()
+    return settings
 
 
-def main() -> None:
-    filename: str = get_argument()
-    config: Dict[str, str] = read_config(filename)
-    max_workers_value: int = int(config["max_workers"])
+@click.command()
+@click.option("-c", "--config", type=str)
+def cli(config: Optional[str]) -> None:
+    settings: Dict[str, str] = read_config(config)
+    max_workers_value: int = int(settings["max_workers"])
     pool: ProcessPoolExecutor = ProcessPoolExecutor(max_workers=max_workers_value)
-    input: str = config["input"]
-    output: str = config["output"]
-    command: str = config["command"]
+    input: Path = Path(settings["input"])
+    output: Path = Path(settings["output"])
+    command: str = settings["command"]
     dig_partial: partial[str] = partial(dig_wrapper, command)
     lines: Iterator[str] = get_lines(input)
     jsonlines: List[str] = list(pool.map(dig_partial, lines))
     text: str = "\n".join(jsonlines)
-    file: IO[str] = open(output, "w")
-    file.write(text)
-    file.close()
+    f: IO[str] = open(output, "w")
+    f.write(text)
+    f.close()
+    click.echo("Done!")
 
 
 if __name__ == "__main__":
-    main()
+    cli()
